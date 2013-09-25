@@ -1,0 +1,13 @@
+{
+    "name": "petrgrishin/yiimigrate",
+    "description": "Migrate сommand supporting modules for Yii 1.1",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "Command": "src/"
+        }
+    }
+}
