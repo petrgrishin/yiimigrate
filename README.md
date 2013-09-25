@@ -3,6 +3,18 @@ yiimigrate
 
 Migrate сommand supporting modules for Yii 1.1
 
+Install 
+-------
+
+composer.json:
+```json
+{
+  "require": {
+    "petrgrishin/yiimigrate": "dev-master"
+  }
+}
+```
+
 Usage
 -----
 
