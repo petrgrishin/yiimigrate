@@ -10,6 +10,9 @@ use Yii;
 
 Yii::import('system.cli.commands.MigrateCommand');
 
+/**
+ * Command for manage migrations of application and modules.
+ */
 class MigrateCommand extends \MigrateCommand{
 
     const MIGRATE_PATH = 'migrations';
@@ -54,6 +57,12 @@ class MigrateCommand extends \MigrateCommand{
         return $migrations;
     }
 
+    /**
+     * Fetching migration class to file name under
+     * requested path.
+     * @param  string $migrationPath
+     * @return array [migrationClass => filePath]
+     */
     protected function getMigrationFiles($migrationPath) {
         $files = array();
         $handle = opendir($migrationPath);
@@ -70,6 +79,9 @@ class MigrateCommand extends \MigrateCommand{
         return $files;
     }
 
+    /**
+     * @return array [timeMarkFromClassName => migrationClass]
+     */
     protected function getAppliedMigrations() {
         $applied = array();
         foreach($this->getMigrationHistory(-1) as $version => $time) {
@@ -79,7 +91,7 @@ class MigrateCommand extends \MigrateCommand{
     }
 
     /**
-     * @return array
+     * @return array     List of existed migration directories of plugged modules
      */
     private function getModulesMigrationPaths() {
         $paths = array();
@@ -98,7 +110,8 @@ class MigrateCommand extends \MigrateCommand{
     }
 
     /**
-     * @return array [filePath => migrationClass]
+     * Build and cache migration files map
+     * @return array [migrationClass => filePath]
      */
     protected function getMigrationToFileMap() {
         if (null === $this->_migrationToFileMap) {
@@ -121,7 +134,7 @@ class MigrateCommand extends \MigrateCommand{
     }
 
     /**
-     * @param $className
+     * @param string $className Class name to load
      */
     private function loadMigration($className) {
         $migrationToFileMap = $this->getMigrationToFileMap();
