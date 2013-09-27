@@ -6,6 +6,7 @@
 
 namespace Command;
 
+use Exception;
 use Yii;
 
 Yii::import('system.cli.commands.MigrateCommand');
@@ -22,14 +23,7 @@ class MigrateCommand extends \MigrateCommand{
     public $module = null;
 
     public function beforeAction($action, $params) {
-
-        if ($this->module && $module = Yii::app()->getModule($this->module)) {
-            $moduleMigratePath = $module->basePath . DIRECTORY_SEPARATOR . self::MIGRATE_PATH;
-            $moduleMigratePathAlias = 'modules.' . $module->id;
-            Yii::setPathOfAlias($moduleMigratePathAlias, $moduleMigratePath);
-            $this->migrationPath = $moduleMigratePathAlias;
-        }
-
+        $this->module && $this->migrationPath = $this->getModuleMigratePathAlias(Yii::app()->getModule($this->module));
         return parent::beforeAction($action, $params);
     }
 
@@ -153,6 +147,21 @@ class MigrateCommand extends \MigrateCommand{
         );
         $colorCode = $colorCodeAvalible[$color];
         echo "\033[01;{$colorCode}m{$str}\033[0m\n";
+    }
+
+    /**
+     * @param $moduleInstance
+     * @throws \Exception
+     * @return string
+     */
+    private function getModuleMigratePathAlias($moduleInstance) {
+        if (!$moduleInstance) {
+            throw new Exception('Module not found');
+        }
+        $moduleMigratePath = $moduleInstance->basePath . DIRECTORY_SEPARATOR . self::MIGRATE_PATH;
+        $moduleMigratePathAlias = 'modules.' . $moduleInstance->id;
+        Yii::setPathOfAlias($moduleMigratePathAlias, $moduleMigratePath);
+        return $moduleMigratePathAlias;
     }
 
     protected function getTemplate() {
