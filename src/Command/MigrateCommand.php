@@ -183,4 +183,11 @@ class {ClassName} extends CDbMigration {
 }
 EOD;
     }
+
+    /**
+     * @return string
+     */
+    static public function className() {
+        return get_called_class();
+    }
 }
