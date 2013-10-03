@@ -15,6 +15,18 @@ composer.json:
 }
 ```
 
+config:
+```php
+<?php
+return array(
+  'commandMap' => array(
+    'migrate' => array(
+      'class' => \Command\MigrateCommand::className(),
+    ),
+  ),
+);
+```
+
 Usage
 -----
 
