@@ -36,6 +36,7 @@ Applies new migrations only for the selected module:
 Creates a new migration for the selected module:
   php yiic migrate create migrateName --module=moduleNameInConfiguration
 
+
 EOD;
         return $help . parent::getHelp();
     }
