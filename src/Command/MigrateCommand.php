@@ -22,6 +22,24 @@ class MigrateCommand extends \MigrateCommand{
 
     public $module = null;
 
+    /**
+     * @return string
+     */
+    public function getHelp() {
+        $help = <<<EOD
+Applies ALL new migrations including migrate all registred application modules:
+  php yiic migrate up
+
+Applies new migrations only for the selected module:
+  php yiic migrate up --module=moduleNameInConfiguration
+
+Creates a new migration for the selected module:
+  php yiic migrate create migrateName --module=moduleNameInConfiguration
+
+EOD;
+        return $help . parent::getHelp();
+    }
+
     public function beforeAction($action, $params) {
         $this->module && $this->migrationPath = $this->getModuleMigratePathAlias(Yii::app()->getModule($this->module));
         return parent::beforeAction($action, $params);
