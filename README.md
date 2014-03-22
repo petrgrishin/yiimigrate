@@ -3,6 +3,10 @@ yiimigrate
 
 Migrate сommand supporting modules for Yii 1.1
 
+Current version
+---------------
+0.4
+
 Install 
 -------
 
