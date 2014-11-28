@@ -1,11 +1,11 @@
 yiimigrate
 ==========
 
-Migrate сommand supporting modules for Yii 1.1
+Migrate Command supporting modules for Yii 1.1
 
 Current version
 ---------------
-0.4
+0.5
 
 Install 
 -------
@@ -14,7 +14,7 @@ composer.json:
 ```json
 {
   "require": {
-    "petrgrishin/yiimigrate": "dev-master"
+    "petrgrishin/yiimigrate": "0.5"
   }
 }
 ```
@@ -34,17 +34,17 @@ return array(
 Usage
 -----
 
-Applies ALL new migrations including migrate all registred application modules:
+Applies ALL new migrations including migrate all registered application modules:
 ```
 php yiic migrate up
 ```
 
 Applies new migrations only for the selected module:
 ```
-php yiic migrate up --module=moduleNameInConfiguration
+php yiic migrate up --module=moduleNameFromConfiguration
 ```
 
 Creates a new migration for the selected module:
 ```
-php yiic migrate create migrateName --module=moduleNameInConfiguration
+php yiic migrate create migrateName --module=moduleNameFromConfiguration
 ```

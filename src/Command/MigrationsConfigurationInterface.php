@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the petrgrishin/yiimigrate package.
+ * This file is part of the yiimigrate package.
  *
  * (c) Petr Grishin <petr.grishin@grishini.ru>
  * (c) Anton Tyutin <anton@tyutin.ru>
