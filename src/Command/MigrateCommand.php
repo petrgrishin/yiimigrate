@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the petrgrishin/yiimigrate package.
+ * This file is part of the yiimigrate package.
  *
  * (c) Petr Grishin <petr.grishin@grishini.ru>
  * (c) Anton Tyutin <anton@tyutin.ru>
@@ -41,14 +41,14 @@ class MigrateCommand extends \MigrateCommand{
      */
     public function getHelp() {
         $help = <<<EOD
-Applies ALL new migrations including migrate all registred application modules:
+Applies ALL new migrations including migrate all registered application modules:
   php yiic migrate up
 
 Applies new migrations only for the selected module:
-  php yiic migrate up --module=moduleNameInConfiguration
+  php yiic migrate up --module=moduleNameFromConfiguration
 
 Creates a new migration for the selected module:
-  php yiic migrate create migrateName --module=moduleNameInConfiguration
+  php yiic migrate create migrateName --module=moduleNameFromConfiguration
 
 
 EOD;
