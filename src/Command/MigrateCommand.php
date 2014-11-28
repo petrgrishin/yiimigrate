@@ -1,7 +1,12 @@
 <?php
-/**
- * @author Petr Grishin <petr.grishin@grishini.ru>
- * @author Anton Tyutin <anton@tyutin.ru>
+/*
+ * This file is part of the petrgrishin/yiimigrate package.
+ *
+ * (c) Petr Grishin <petr.grishin@grishini.ru>
+ * (c) Anton Tyutin <anton@tyutin.ru>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Command;
@@ -16,7 +21,16 @@ Yii::import('system.cli.commands.MigrateCommand');
  */
 class MigrateCommand extends \MigrateCommand{
 
-    const MIGRATE_PATH = 'migrations';
+    const DEFAULT_MIGRATIONS_DIR = 'migrations';
+
+    const COLOR_BLACK   = '30';
+    const COLOR_RED     = '31';
+    const COLOR_GREEN   = '32';
+    const COLOR_YELLOW  = '33';
+    const COLOR_BLUE    = '34';
+    const COLOR_MAGENTA = '35';
+    const COLOR_CYAN    = '36';
+    const COLOR_WHITE   = '37';
 
     private $_migrationToFileMap = null;
 
@@ -112,11 +126,11 @@ EOD;
             if (isset($paths[$config['class']])) {
                 continue;
             }
-            if (file_exists($moduleMigratePath = Yii::app()->getModule($name)->basePath . DIRECTORY_SEPARATOR . self::MIGRATE_PATH)) {
-                $this->printColor("Load module `{$name}` migrations from " . $moduleMigratePath, 'orange');
+            if (file_exists($moduleMigratePath = $this->getMigrationsPath(Yii::app()->getModule($name)))) {
+                $this->printColor("Load module `{$name}` migrations from " . $moduleMigratePath, self::COLOR_YELLOW);
                 $paths[$config['class']] = $moduleMigratePath;
             } else {
-                $this->printColor("Module `{$name}` does not have migration dir", 'red');
+                $this->printColor("Module `{$name}` does not have migrations directory", self::COLOR_CYAN);
             }
         }
         return array_values($paths);
@@ -152,24 +166,21 @@ EOD;
     private function loadMigration($className) {
         $migrationToFileMap = $this->getMigrationToFileMap();
         if (!isset($migrationToFileMap[$className])) {
-            $this->printColor("Cannot load migration class `{$className}`. Probably the migration belongs to module that has been unplugged.", 'red');
+            $this->printColor(
+                "Cannot load migration class `{$className}`."
+                    . " Probably the migration belongs to module that has been unplugged.",
+                self::COLOR_RED);
             exit(1);
         }
         require_once($migrationToFileMap[$className]);
     }
 
-    private function printColor($str, $color = 'green') {
-        $colorCodeAvalible = array(
-            'orange' => 33,
-            'green'  => 32,
-            'red'    => 31
-        );
-        $colorCode = $colorCodeAvalible[$color];
-        echo "\033[01;{$colorCode}m{$str}\033[0m\n";
+    private function printColor($str, $color = self::COLOR_GREEN) {
+        echo "\033[1;{$color}m{$str}\033[0m\n";
     }
 
     /**
-     * @param $moduleInstance
+     * @param \CModule $moduleInstance
      * @throws \Exception
      * @return string
      */
@@ -177,9 +188,8 @@ EOD;
         if (!$moduleInstance) {
             throw new Exception('Module not found');
         }
-        $moduleMigratePath = $moduleInstance->basePath . DIRECTORY_SEPARATOR . self::MIGRATE_PATH;
         $moduleMigratePathAlias = 'modules.' . $moduleInstance->id;
-        Yii::setPathOfAlias($moduleMigratePathAlias, $moduleMigratePath);
+        Yii::setPathOfAlias($moduleMigratePathAlias, $this->getMigrationsPath($moduleInstance));
         return $moduleMigratePathAlias;
     }
 
@@ -208,5 +218,20 @@ EOD;
      */
     static public function className() {
         return get_called_class();
+    }
+
+    /**
+     * @param \CModule $moduleInstance
+     *
+     * @return string
+     */
+    private function getMigrationsPath($moduleInstance)
+    {
+        $migrationsDirName = $moduleInstance instanceof MigrationsConfigurationInterface
+            ? $moduleInstance->migrationsDirectory()
+            : self::DEFAULT_MIGRATIONS_DIR;
+        $moduleMigratePath = $moduleInstance->basePath . DIRECTORY_SEPARATOR . $migrationsDirName;
+
+        return $moduleMigratePath;
     }
 }
