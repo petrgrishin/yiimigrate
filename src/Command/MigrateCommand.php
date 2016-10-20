@@ -36,6 +36,8 @@ class MigrateCommand extends \MigrateCommand{
 
     public $module = null;
 
+    public $silent = null;
+
     /**
      * @return string
      */
@@ -43,6 +45,9 @@ class MigrateCommand extends \MigrateCommand{
         $help = <<<EOD
 Applies ALL new migrations including migrate all registered application modules:
   php yiic migrate up
+
+Applies ALL new migrations and minimize output:
+  php yiic migrate up --silent=1
 
 Applies new migrations only for the selected module:
   php yiic migrate up --module=moduleNameFromConfiguration
@@ -61,7 +66,7 @@ EOD;
     }
 
     protected function afterAction($action, $params, $exitCode = 0) {
-        $this->printColor('');
+        $this->msg('');
         return parent::afterAction($action, $params, $exitCode);
     }
 
@@ -127,10 +132,10 @@ EOD;
                 continue;
             }
             if (file_exists($moduleMigratePath = $this->getMigrationsPath(Yii::app()->getModule($name)))) {
-                $this->printColor("Load module `{$name}` migrations from " . $moduleMigratePath, self::COLOR_YELLOW);
+                $this->msg("Load module `{$name}` migrations from " . $moduleMigratePath, self::COLOR_YELLOW);
                 $paths[$config['class']] = $moduleMigratePath;
             } else {
-                $this->printColor("Module `{$name}` does not have migrations directory", self::COLOR_CYAN);
+                $this->msg("Module `{$name}` does not have migrations directory", self::COLOR_CYAN);
             }
         }
         return array_values($paths);
@@ -144,7 +149,7 @@ EOD;
         if (null === $this->_migrationToFileMap) {
             $files = array();
 
-            $this->printColor('Load application migrations from ' . $this->migrationPath);
+            $this->msg('Load application migrations from ' . $this->migrationPath);
             $paths = array(
                 $this->migrationPath,
             );
@@ -166,13 +171,22 @@ EOD;
     private function loadMigration($className) {
         $migrationToFileMap = $this->getMigrationToFileMap();
         if (!isset($migrationToFileMap[$className])) {
-            $this->printColor(
+            $this->err(
                 "Cannot load migration class `{$className}`."
-                    . " Probably the migration belongs to module that has been unplugged.",
-                self::COLOR_RED);
+                    . " Probably the migration belongs to module that has been unplugged."
+            );
             exit(1);
         }
         require_once($migrationToFileMap[$className]);
+    }
+
+    private function msg($message, $color = self::COLOR_GREEN) {
+        if ("1" !== $this->silent)
+            $this->printColor($message, $color);
+    }
+
+    private function err($message) {
+        $this->printColor($message, self::COLOR_RED);
     }
 
     private function printColor($str, $color = self::COLOR_GREEN) {
@@ -225,8 +239,7 @@ EOD;
      *
      * @return string
      */
-    private function getMigrationsPath($moduleInstance)
-    {
+    private function getMigrationsPath($moduleInstance) {
         $migrationsDirName = $moduleInstance instanceof MigrationsConfigurationInterface
             ? $moduleInstance->migrationsDirectory()
             : self::DEFAULT_MIGRATIONS_DIR;
